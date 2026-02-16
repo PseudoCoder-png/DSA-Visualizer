@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useVisualizer } from '../hooks/useVisualizer';
 import { motion } from 'framer-motion';
 import { Play, Pause, RotateCcw, Code2, Copy, Download, Check } from 'lucide-react';
@@ -6,6 +6,61 @@ import { bubbleSort } from '../algorithms/bubbleSort';
 import { selectionSort } from '../algorithms/selectionSort';
 import { quickSort } from '../algorithms/quickSort';
 import { linearSearch } from '../algorithms/linearSearch'; 
+
+const CPP_KEYWORDS = new Set([
+  'alignas', 'alignof', 'asm', 'auto', 'break', 'case', 'catch', 'class', 'const',
+  'constexpr', 'const_cast', 'continue', 'default', 'delete', 'do', 'else', 'enum',
+  'explicit', 'export', 'extern', 'false', 'for', 'friend', 'goto', 'if', 'inline',
+  'mutable', 'namespace', 'new', 'noexcept', 'nullptr', 'operator', 'private',
+  'protected', 'public', 'register', 'reinterpret_cast', 'return', 'sizeof', 'static',
+  'static_cast', 'struct', 'switch', 'template', 'this', 'throw', 'true', 'try',
+  'typedef', 'typeid', 'typename', 'union', 'using', 'virtual', 'volatile', 'while',
+]);
+
+const CPP_TYPES = new Set([
+  'bool', 'char', 'char16_t', 'char32_t', 'double', 'float', 'int', 'long', 'short',
+  'signed', 'size_t', 'std', 'string', 'unsigned', 'void', 'wchar_t',
+]);
+
+const CPP_TOKEN_REGEX = /\/\*[\s\S]*?\*\/|\/\/.*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|^\s*#.*$|\b\d+(?:\.\d+)?\b|\b[a-zA-Z_]\w*\b/gm;
+
+function getCppTokenClass(token) {
+  if (token.startsWith('//') || token.startsWith('/*')) return 'text-emerald-300';
+  if (token.startsWith('"') || token.startsWith("'")) return 'text-amber-300';
+  if (token.trimStart().startsWith('#')) return 'text-fuchsia-300';
+  if (/^\d/.test(token)) return 'text-orange-300';
+  if (CPP_TYPES.has(token)) return 'text-cyan-300';
+  if (CPP_KEYWORDS.has(token)) return 'text-sky-300';
+  return 'text-slate-100';
+}
+
+function renderHighlightedCpp(code) {
+  const nodes = [];
+  let lastIndex = 0;
+
+  for (const match of code.matchAll(CPP_TOKEN_REGEX)) {
+    const token = match[0];
+    const start = match.index ?? 0;
+
+    if (start > lastIndex) {
+      nodes.push(code.slice(lastIndex, start));
+    }
+
+    nodes.push(
+      <span key={`${start}-${token}`} className={getCppTokenClass(token)}>
+        {token}
+      </span>
+    );
+
+    lastIndex = start + token.length;
+  }
+
+  if (lastIndex < code.length) {
+    nodes.push(code.slice(lastIndex));
+  }
+
+  return nodes;
+}
 
 const algorithmMap = {
   'Bubble Sort': {
@@ -28,6 +83,7 @@ export default function VisualizerPage({ name, codeSnippet }) {
   const [isSorting, setIsSorting] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const codeLines = useMemo(() => (codeSnippet || '').split('\n'), [codeSnippet]);
   
   const stopSignal = useRef(false);
   const pauseSignal = useRef(false);
@@ -167,9 +223,18 @@ export default function VisualizerPage({ name, codeSnippet }) {
             </div>
           </div>
           <div className="p-8 overflow-x-auto">
-            <pre className="text-sm font-mono leading-relaxed text-blue-100 whitespace-pre">
-              <code>{codeSnippet}</code>
-            </pre>
+            <div className="min-w-max text-sm font-mono leading-relaxed">
+              {codeLines.map((line, index) => (
+                <div key={`line-${index}`} className="grid grid-cols-[3rem_1fr]">
+                  <span className="select-none pr-3 text-right text-slate-500 border-r border-slate-800">
+                    {index + 1}
+                  </span>
+                  <code className="pl-4 whitespace-pre text-slate-200">
+                    {line ? renderHighlightedCpp(line) : ' '}
+                  </code>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
