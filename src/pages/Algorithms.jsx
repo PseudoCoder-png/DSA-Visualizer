@@ -20,7 +20,13 @@ export default function Algorithms() {
       title: "Quick Sort",
       description: "Quick sort is a highly efficient divide-and-conquer algorithm that picks a 'pivot' and partitions the array around it.",
       path: '/visualizer/quick-sort'
-    }
+    },
+    {
+      id: "linear-search",
+      title: "Linear Search",
+      description: "A simple search algorithm that checks every element in the list sequentially until a match is found.",
+      path: '/visualizer/linear-search'
+    },
     // Future algorithms can be added here easily!
   ];
 

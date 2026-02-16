@@ -8,6 +8,7 @@ import VisualizerPage from './pages/VisualizerPage';
 import { bubbleSort, bubbleSortCPP } from './algorithms/bubbleSort';
 import { selectionSort , selectionSortCPP} from './algorithms/selectionSort';
 import { quickSort, quickSortCPP } from './algorithms/quickSort';
+import { linearSearch, linearSearchCPP } from './algorithms/linearSearch'; 
 
 export default function App() {
   return (
@@ -34,6 +35,10 @@ export default function App() {
             <Route 
               path="/visualizer/quick-sort"
               element={<VisualizerPage name="Quick Sort" codeSnippet={quickSortCPP} />}
+            />
+            <Route 
+              path="/visualizer/linear-search"
+              element={<VisualizerPage name="Linear Search" codeSnippet={linearSearchCPP} />}
             />
           </Routes>
         </main>

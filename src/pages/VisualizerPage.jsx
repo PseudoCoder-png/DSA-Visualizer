@@ -5,6 +5,7 @@ import { RefreshCw, Play, Pause, RotateCcw, Code2 } from 'lucide-react';
 import { bubbleSort } from '../algorithms/bubbleSort';
 import { selectionSort } from '../algorithms/selectionSort';
 import { quickSort } from '../algorithms/quickSort';
+import { linearSearch } from '../algorithms/linearSearch'; 
 
 const algorithmMap = {
   'Bubble Sort': {
@@ -15,6 +16,9 @@ const algorithmMap = {
   },
   'Quick Sort': {
     run: quickSort,
+  },
+  'Linear Search': {
+    run: linearSearch,
   },
 // Add your algorithm name and function to the run parameter.
 };
@@ -77,6 +81,7 @@ export default function VisualizerPage({ name, codeSnippet }) {
                 item.status === 'swapping' ? 'bg-red-500' :
                 item.status === 'sorted' ? 'bg-green-500' :
                 item.status === 'pivot' ? 'bg-purple-500' :
+                item.status === 'target' ? 'bg-pink-500' :
                 'bg-blue-600'
               }`}
               style={{ height: `${(item.value / 400) * 100}%` }} 
